@@ -6,14 +6,16 @@ class PointBuilder:
         # figuras del canvas
         self.fig = fig
         self.ax = ax
-        self.plot = self.ax.scatter([], [], color='red', marker='o')
-        self.another = self.ax.scatter([], [], color='blue', marker='o')
-        self.class3 = self.ax.scatter([], [], color='green', marker='o')
+        self.plot = self.ax.scatter([], [], color='red', marker='o')# 0
+        self.another = self.ax.scatter([], [], color='blue', marker='o')# 1
+        self.class3 = self.ax.scatter([], [], color='green', marker='o')# -1
         # figuras del barrido del canvas
-        self.fig_x = self.ax.scatter([], [], color='darkred', marker='.')
-        self.fig_y = self.ax.scatter([], [], color='darkcyan', marker='.')
-        self.fig_w = self.ax.scatter([], [], color='tomato', marker='.')
-        self.fig_z = self.ax.scatter([], [], color='cyan', marker='.')
+        self.fig_a = self.ax.scatter([], [], color='darkred', marker=',')# 0
+        self.fig_b = self.ax.scatter([], [], color='darkcyan', marker=',')# 1
+        self.fig_c = self.ax.scatter([], [], color='tomato', marker=',')# 0.5
+        self.fig_d = self.ax.scatter([], [], color='cyan', marker=',')# 1.5
+        self.fig_e = self.ax.scatter([], [], color='green', marker=',')# -1
+        self.fig_f = self.ax.scatter([], [], color='lime', marker=',')# 1.5
         # conexión del evento para detección de clicks
         self.cid = self.fig.figure.canvas.mpl_connect('button_press_event', self)
         # datos de las clases de entrada
@@ -21,6 +23,8 @@ class PointBuilder:
         self.dataClass2 = []
         self.dataClass3 = []
         # datos de el barrido
+        self.dataPlot1 = []
+        self.dataPlot2 = []
         self.dataPlot3 = []
         self.dataPlot4 = []
         self.dataPlot5 = []
@@ -33,9 +37,15 @@ class PointBuilder:
 
 
     def set_lines_graph(self, n):
-        for index in range(n):
-            line, = self.ax.plot(0, 0, 'b-')
-            self.__lines.append(line)
+        if len(self.__lines) == 0:
+            for index in range(n):
+                line, = self.ax.plot(0, 0, 'b-')
+                self.__lines.append(line)
+        else:
+            diff = n - len(self.__lines)
+            for index in range(diff):
+                line, = self.ax.plot(0, 0, 'b-')
+                self.__lines.append(line)   
         
 
     # función que nos actualizará el estado del evento de clicks
@@ -57,7 +67,7 @@ class PointBuilder:
             case 1:
                 self.dataClass2.append((event.xdata, event.ydata))
                 self.another.set_offsets(self.dataClass2)
-            case 0.5:
+            case -1:
                 self.dataClass3.append((event.xdata, event.ydata))
                 self.class3.set_offsets(self.dataClass3)
         # actualización de la figura
@@ -76,21 +86,6 @@ class PointBuilder:
         self.fig.canvas.draw()
         self.fig.canvas.flush_events()
 
-    # función que agrega el barrido al canvas con los datos proporcionados del adaline
-    def set_new_points_adaline(self, x1, x2, predict_class):
-        if predict_class >= 0 and predict_class < 0.25:
-            self.dataPlot3.append((x1, x2))
-            self.fig_x.set_offsets(self.dataPlot3)
-        elif predict_class >= 0.25 and predict_class < 0.5:
-            self.dataPlot5.append((x1, x2))
-            self.fig_w.set_offsets(self.dataPlot5)
-        elif predict_class >= 0.5 and predict_class < 0.75:
-            self.dataPlot6.append((x1, x2))
-            self.fig_z.set_offsets(self.dataPlot6)
-        elif predict_class >= 0.75 and predict_class <= 1.0:
-            self.dataPlot4.append((x1, x2))
-            self.fig_y.set_offsets(self.dataPlot4)
-
     
 
     # función que nos actualiza la línea de la frontera de decisión
@@ -103,13 +98,14 @@ class PointBuilder:
         self.fig.canvas.draw()
         self.fig.canvas.flush_events()
 
-    def update_lines(self, w):
+    def update_lines(self, data):
         line_points = np.linspace(-5, 5)
-        for index in range(3):
-            weigth = w[index]
-            w0 = weigth[0]
-            w1 = weigth[1]
-            w2 = weigth[2]
+        w_1, w_0, n = data
+        for index in range(n):
+            weigth = w_1[index,:]
+            w1 = weigth[0]
+            w2 = weigth[1]
+            w0 = w_0[index,:]
             self.__lines[index].set_xdata(line_points)
             weights_data = (-w1 * line_points + w0) / w2
             self.__lines[index].set_ydata(weights_data)
@@ -121,15 +117,12 @@ class PointBuilder:
         self.data.append(data_add)
 
     # metodo que limpia de manera completa, los datos presentes en el programa
-    def clear_graph(self):
+    def clear_graph(self, type):
         # limpiar los datos de los arrays para los gráficos
-        self.dataPlot = []
-        self.dataPlot2 = []
-        self.dataPlot3 = []
         self.dataPlot4 = []
         self.dataPlot5 = []
         self.dataPlot6 = []
-        self.class_data = -1  
+        self.class_data = -2  
         # restablecer los subgraficos del gráfico principal
         self.ax.cla()
         self.plot = self.ax.scatter([], [], color='red', marker='o')
@@ -138,36 +131,54 @@ class PointBuilder:
         self.__line, = self.ax.plot(0, 0, 'b-')
         self.ax.set_xlim([-5, 5])
         self.ax.set_ylim([-5, 5])
-        self.ax.set_title('Perceptron Adaline')
+        self.ax.set_title('Perceptron Multicapa')
         # reestablecer el barrido del perceptron
-        self.fig_x = self.ax.scatter([], [], color='darkred', marker='.')
-        self.fig_y = self.ax.scatter([], [], color='darkcyan', marker='.')
-        self.fig_w = self.ax.scatter([], [], color='tomato', marker='.')
-        self.fig_z = self.ax.scatter([], [], color='cyan', marker='.')
+        self.fig_a = self.ax.scatter([], [], color='darkred', marker='.')
+        self.fig_b = self.ax.scatter([], [], color='darkcyan', marker='.')
+        self.fig_c = self.ax.scatter([], [], color='tomato', marker='.')
+        self.fig_d = self.ax.scatter([], [], color='cyan', marker='.')
+        self.fig_e = self.ax.scatter([], [], color='green', marker='.')
+        self.fig_f = self.ax.scatter([], [], color='lime', marker='.')
         self.fig.canvas.draw()
         self.fig.canvas.flush_events()
 
+
     # función que dibuja en el plano la superficie de desición adaline
-    def draw_desition_adaline_superface(self, perceptron):
+    def draw_desition_mlp_superface(self, mlp):
         line_points = [] # lista de los datos con su respectivas clases predecidas
-        n_points = 100
-        n_points_y = 18
+        n_points = 200
+        n_points_y = 30
         feature_x = np.linspace(-5, 5, n_points)
-        feature_y = np.linspace(-4.7, 4.7, n_points_y)
+        feature_y = np.linspace(-1, 1, n_points_y)
         for index in range(0, n_points_y):
             y = feature_y[index]
             for subIndex in range(0, n_points):
                 x = feature_x[subIndex]
-                class_predicted = perceptron.return_value_of_f_y_for_predict(x, y, 1)
+                data = np.array([x, y])
+                class_predicted = np.asscalar(np.round(mlp.predict(data)))
+                print(class_predicted)
                 line_points.append((x, y, class_predicted))
         for value in line_points:
             x = value[0]
             y = value[1]
             class_data = value[2]
-            self.set_new_points_adaline(x, y, class_data)
+            self.set_new_points_mlp(x, y, class_data)
         line_points.clear()
         self.fig.canvas.draw()
         self.fig.canvas.flush_events()
+
+     # función que agrega el barrido al canvas con los datos proporcionados del adaline
+    def set_new_points_mlp(self, x1, x2, predict_class):
+        if predict_class == 0:
+            self.dataPlot1.append((x1, x2))
+            self.fig_a.set_offsets(self.dataPlot1)
+        elif predict_class == 1:
+            self.dataPlot2.append((x1, x2))
+            self.fig_b.set_offsets(self.dataPlot2)
+        elif predict_class == -1:
+            self.dataPlot5.append((x1, x2))
+            self.fig_e.set_offsets(self.dataPlot5)
+        
 
         
 
@@ -177,8 +188,11 @@ class PointBuilder:
     
 
     def get_data_class_one(self):
-        return self.dataPlot
+        return self.dataClass1
     
 
     def get_data_class_two(self):
-        return self.dataPlot2
+        return self.dataClass2
+
+    def get_data_class_three(self):
+        return self.dataClass3

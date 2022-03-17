@@ -7,7 +7,7 @@ class GraphSquareError:
 		self.__fig = fig
 		self.__ax = ax
 		# linea del error
-		self.__line = self.__ax.plot(0, 0, 'b-')
+		self.__line = self.__ax.plot(0, 0, 'blue')
 		# datos de los errores
 		self.__data = []
 
