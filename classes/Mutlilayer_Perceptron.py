@@ -36,7 +36,7 @@ class MultilayerPerceptron:
 		self.__a1 = None # Funcion de activacion de neuronas ocultas (equivalente a a1)
 		self.__a2 = None # Funcion de activacion de neuronas ocultas (equivalente a a1)
 		self.__a3 = 0.0 # Funcion de activacion en neurona de salida
-		self.__epochs = 8000
+		self.__epochs = 500
         # Variables de retropropagacion
 		self.__real_error = 0
 		self.__s1 = None # Deltas en neuronas ocultas
@@ -134,12 +134,12 @@ class MultilayerPerceptron:
 			self.__error_mlp()# calculo del error de la red
 			print("")
 			n_epochs += 1
-			graph_error.add_data(np.abs(self.__net_error))
+			graph_error.add_data(np.asscalar(np.abs(self.__net_error)))
+			graph_error.update_graph(n_epochs)
 			if n_epochs > self.__epochs:
 				done = True
 				break
 		pointBuilder.update_lines(self.return_w1())
-		graph_error.update_graph(n_epochs)
 		return done
 
 

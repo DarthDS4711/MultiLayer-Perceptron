@@ -13,7 +13,7 @@ class Window:
         # sección de configuración de la ventana
         self.__window = Tk()
         self.__window.geometry('1280x730')
-        self.__window.wm_title('MultilayerPercpetron')
+        self.__window.wm_title('MultilayerPerceptron')
         self.__frame = Frame(self.__window,  bg='gray22', bd=3)
         self.__frame.grid(row=0, column=0, columnspan=10)
         fig, (ax, ax1) = plt.subplots(1, 2)

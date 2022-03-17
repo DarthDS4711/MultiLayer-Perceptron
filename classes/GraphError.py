@@ -7,7 +7,7 @@ class GraphSquareError:
 		self.__fig = fig
 		self.__ax = ax
 		# linea del error
-		self.__line = self.__ax.plot(0, 0, 'blue')
+		self.__line, = self.__ax.plot(0, 0, color='red')
 		# datos de los errores
 		self.__data = []
 
@@ -16,13 +16,14 @@ class GraphSquareError:
 
 	# funcion que actualiza la grafica del error
 	def update_graph(self, epochs):
-		line_points = np.arange(epochs)
-		self.__ax.plot(line_points, self.__data)
+		line_points = np.linspace(-1, epochs, epochs)
+		self.__line.set_xdata(line_points)
+		self.__line.set_ydata(np.array(self.__data))
 		self.__fig.canvas.draw()
 		self.__fig.canvas.flush_events()
 
 	def clear_graph_error(self):
-		self.__line = self.__ax.plot(0, 0, 'b-')
+		self.__line, = self.__ax.plot(0, 0, color='red')
 		self.__data.clear()
 		self.__ax.clear()
 		self.__fig.canvas.draw()

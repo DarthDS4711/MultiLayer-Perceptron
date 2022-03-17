@@ -99,7 +99,7 @@ class PointBuilder:
         self.fig.canvas.flush_events()
 
     def update_lines(self, data):
-        line_points = np.linspace(-5, 5)
+        line_points = np.linspace(-1, 1)
         w_1, w_0, n = data
         for index in range(n):
             weigth = w_1[index,:]
@@ -129,8 +129,8 @@ class PointBuilder:
         self.another = self.ax.scatter([], [], color='blue', marker='o')
         self.class3 = self.ax.scatter([], [], color='green', marker='o')
         self.__line, = self.ax.plot(0, 0, 'b-')
-        self.ax.set_xlim([-5, 5])
-        self.ax.set_ylim([-5, 5])
+        self.ax.set_xlim([-1, 1])
+        self.ax.set_ylim([-1, 1])
         self.ax.set_title('Perceptron Multicapa')
         # reestablecer el barrido del perceptron
         self.fig_a = self.ax.scatter([], [], color='darkred', marker='.')
@@ -147,8 +147,8 @@ class PointBuilder:
     def draw_desition_mlp_superface(self, mlp):
         line_points = [] # lista de los datos con su respectivas clases predecidas
         n_points = 200
-        n_points_y = 30
-        feature_x = np.linspace(-5, 5, n_points)
+        n_points_y = 40
+        feature_x = np.linspace(-1, 1, n_points)
         feature_y = np.linspace(-1, 1, n_points_y)
         for index in range(0, n_points_y):
             y = feature_y[index]
@@ -156,7 +156,6 @@ class PointBuilder:
                 x = feature_x[subIndex]
                 data = np.array([x, y])
                 class_predicted = np.asscalar(np.round(mlp.predict(data)))
-                print(class_predicted)
                 line_points.append((x, y, class_predicted))
         for value in line_points:
             x = value[0]
