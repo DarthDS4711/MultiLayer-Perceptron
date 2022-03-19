@@ -28,3 +28,9 @@ class GraphSquareError:
 		self.__ax.clear()
 		self.__fig.canvas.draw()
 		self.__fig.canvas.flush_events()
+
+
+	def set_number_of_epochs(self, n_epochs):
+		self.__ax.set_xlim([-1, (n_epochs + 2)])
+		self.__fig.canvas.draw()
+		self.__fig.canvas.flush_events()

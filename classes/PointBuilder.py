@@ -10,12 +10,13 @@ class PointBuilder:
         self.another = self.ax.scatter([], [], color='blue', marker='o')# 1
         self.class3 = self.ax.scatter([], [], color='green', marker='o')# -1
         # figuras del barrido del canvas
-        self.fig_a = self.ax.scatter([], [], color='darkred', marker=',')# 0
-        self.fig_b = self.ax.scatter([], [], color='darkcyan', marker=',')# 1
-        self.fig_c = self.ax.scatter([], [], color='tomato', marker=',')# 0.5
-        self.fig_d = self.ax.scatter([], [], color='cyan', marker=',')# 1.5
-        self.fig_e = self.ax.scatter([], [], color='green', marker=',')# -1
-        self.fig_f = self.ax.scatter([], [], color='lime', marker=',')# 1.5
+        self.__size_dot = 5
+        self.fig_a = self.ax.scatter([], [], color='darkred', marker='.', s=self.__size_dot)
+        self.fig_b = self.ax.scatter([], [], color='darkcyan', marker='.', s=self.__size_dot)
+        self.fig_c = self.ax.scatter([], [], color='tomato', marker='.', s=self.__size_dot)
+        self.fig_d = self.ax.scatter([], [], color='cyan', marker='.', s=self.__size_dot)
+        self.fig_e = self.ax.scatter([], [], color='green', marker='.', s=self.__size_dot)
+        self.fig_f = self.ax.scatter([], [], color='lime', marker='.', s=self.__size_dot)
         # conexión del evento para detección de clicks
         self.cid = self.fig.figure.canvas.mpl_connect('button_press_event', self)
         # datos de las clases de entrada
@@ -133,12 +134,12 @@ class PointBuilder:
         self.ax.set_ylim([-1, 1])
         self.ax.set_title('Perceptron Multicapa')
         # reestablecer el barrido del perceptron
-        self.fig_a = self.ax.scatter([], [], color='darkred', marker='.')
-        self.fig_b = self.ax.scatter([], [], color='darkcyan', marker='.')
-        self.fig_c = self.ax.scatter([], [], color='tomato', marker='.')
-        self.fig_d = self.ax.scatter([], [], color='cyan', marker='.')
-        self.fig_e = self.ax.scatter([], [], color='green', marker='.')
-        self.fig_f = self.ax.scatter([], [], color='lime', marker='.')
+        self.fig_a = self.ax.scatter([], [], color='darkred', marker='.', size=self.__size_dot)
+        self.fig_b = self.ax.scatter([], [], color='darkcyan', marker='.', size=self.__size_dot)
+        self.fig_c = self.ax.scatter([], [], color='tomato', marker='.', size=self.__size_dot)
+        self.fig_d = self.ax.scatter([], [], color='cyan', marker='.', size=self.__size_dot)
+        self.fig_e = self.ax.scatter([], [], color='green', marker='.', size=self.__size_dot)
+        self.fig_f = self.ax.scatter([], [], color='lime', marker='.', size=self.__size_dot)
         self.fig.canvas.draw()
         self.fig.canvas.flush_events()
 
@@ -147,7 +148,7 @@ class PointBuilder:
     def draw_desition_mlp_superface(self, mlp):
         line_points = [] # lista de los datos con su respectivas clases predecidas
         n_points = 200
-        n_points_y = 40
+        n_points_y = 20
         feature_x = np.linspace(-1, 1, n_points)
         feature_y = np.linspace(-1, 1, n_points_y)
         for index in range(0, n_points_y):

@@ -14,7 +14,7 @@ class MultilayerPerceptron:
 		self.__us = 1.0 # umbral neurona de salida (equivalente a w0)
 		self.__uoc = None# umbrales de las capa oculta 1 (equivalentes a w0)
 		self.__uoc2 = None # numbrales en la segunda capa oculta (equivalentes a w0)
-		self.__precision = 0.000000001
+		self.__precision = 0.00000001
 		self.__epocas = None
 		self.__fac_ap = 0.2
 		self.__n_inputs = 2
@@ -37,6 +37,7 @@ class MultilayerPerceptron:
 		self.__a2 = None # Funcion de activacion de neuronas ocultas (equivalente a a1)
 		self.__a3 = 0.0 # Funcion de activacion en neurona de salida
 		self.__epochs = 500
+		self.__n_epochs_train = 0
         # Variables de retropropagacion
 		self.__real_error = 0
 		self.__s1 = None # Deltas en neuronas ocultas
@@ -116,9 +117,9 @@ class MultilayerPerceptron:
 
 
 	# función principal para el entrenamiento de la red
-	def train_net(self, graph_error, pointBuilder):
+	def train_net(self, graph_error):
 		n_epochs = 0
-		done = False
+		done = True
 		while(np.abs(self.__net_error) > self.__precision):
 			self.__Error_prev = self.__Ew
 			for index in range(len(self.__d)):
@@ -137,9 +138,9 @@ class MultilayerPerceptron:
 			graph_error.add_data(np.asscalar(np.abs(self.__net_error)))
 			graph_error.update_graph(n_epochs)
 			if n_epochs > self.__epochs:
-				done = True
+				done = False
 				break
-		pointBuilder.update_lines(self.return_w1())
+		self.__n_epochs_train = n_epochs
 		return done
 
 
@@ -189,7 +190,7 @@ class MultilayerPerceptron:
 	def __dsigmode(self, x):
 		return self.__sigmode(x) * (1 - self.__sigmode(x))
 
-	# Función principal que modifca los pesos en base a las capas de salida
+	# Función secundaria que modifca los pesos en base a las capas de salida
 	def __update_weigths(self):
 		match self.__n_layers:
 			case 1:
@@ -251,9 +252,11 @@ class MultilayerPerceptron:
 		self.__Inputs = xi
 		self.__forward()
 		return self.__a3
+	
 
+	# función que retorna el error
+	def return_error(self):
+		return self.__net_error 	
 
-
-
-
-		
+	def return_n_epochs(self):
+		return self.__n_epochs_train	

@@ -20,7 +20,10 @@ class Window:
         fig.set_size_inches(12.5, 4.6)
         ax.set_xlim([-1, 1])
         ax.set_ylim([-1, 1])
+        ax1.set_xlim([0, 8000])
+        ax1.set_ylim([-0.2, 1])
         ax.set_title('Perceptron Multicapa')
+        ax1.set_title('Error cuadrático')
         self.__pointsBuilder = PointBuilder(fig, ax)
         self.__pointsBuilder.set_lines_graph(4)
         self.__graph_error = GraphSquareError(fig, ax1)
@@ -65,7 +68,7 @@ class Window:
         self.__text_false_negative = Text(self.__window, height=1, width=24, state=tkinter.DISABLED)
         self.__text_true_negative = Text(self.__window, height=1, width=24, state=tkinter.DISABLED)
         # cajas de texto que muestran la información del programa
-        self.__text_theta = Text(self.__window, height=1, width=24, state=tkinter.DISABLED)
+        self.__text_error = Text(self.__window, height=1, width=24, state=tkinter.DISABLED)
         self.__text_epochs = Text(self.__window, height=1, width=24, state=tkinter.DISABLED)
         self.__text_train = Text(self.__window, height=1, width=24, state=tkinter.DISABLED)
 
@@ -86,10 +89,10 @@ class Window:
         Label(self.__window, text='Train: ').grid(row=5, column=3)
 
         # labels relacionados a la matriz de confusión
-        Label(self.__window, text='Positivo').grid(row=6, column=2)
-        Label(self.__window, text='Negativo').grid(row=6, column=3)
-        Label(self.__window, text='Positivo').grid(row=7, column=1)
-        Label(self.__window, text='Negativo').grid(row=8, column=1)
+        # Label(self.__window, text='Positivo').grid(row=6, column=2)
+        # Label(self.__window, text='Negativo').grid(row=6, column=3)
+        # Label(self.__window, text='Positivo').grid(row=7, column=1)
+        # Label(self.__window, text='Negativo').grid(row=8, column=1)
 
         # labels de resultado de la matriz de confusión
         self.__lbl1 = Label(self.__window, text='0')
@@ -103,11 +106,16 @@ class Window:
         Label(self.__window, text='Capa oculta 1: ').grid(row=5, column=5)
         Label(self.__window, text='Capa oculta 2: ').grid(row=6, column=5)
 
+        # bloque de variables del programa
+        self.__is_initialize_weigths = False
+        self.__is_selected_neurons = False
+
+
         # sección para inicializar los elementos del programa
         self.set_buttons()
         self.set_entrys()
         # sección para inicializar la matriz de confusión
-        self.set_entry_confuse_matrix()
+        # self.set_entry_confuse_matrix()
         self.set_spinbox_hidden_layer()
         self.__window.mainloop()
 
@@ -135,7 +143,7 @@ class Window:
         self.__entry_learning_rate.grid(row=4, column=1)
         self.__entry_min_error.grid(row=5, column=1)
         # entrys relacionados con desplegar información
-        self.__text_theta.grid(row=3, column=4)
+        self.__text_error.grid(row=3, column=4)
         self.__text_epochs.grid(row=4, column=4)
         self.__text_train.grid(row=5, column=4)
 
@@ -159,7 +167,7 @@ class Window:
 
     # acción del boton para reiniciar la aplicación
     def restart(self):
-        self.__perceptron.restart_perceptron()
+        # self.__perceptron.restart_perceptron()
         self.__pointsBuilder.clear_graph()
         self.__graph_error.clear_graph_error()
         self.update_buttons_entrys(False)
@@ -178,7 +186,7 @@ class Window:
     # función que actualiza el estado de las cajas de texto
     def update_text_boxes(self, state):
         if state:
-            self.__text_theta['state'] = tkinter.NORMAL
+            self.__text_error['state'] = tkinter.NORMAL
             self.__text_epochs['state'] = tkinter.NORMAL
             self.__text_train['state'] = tkinter.NORMAL
             self.__text_true_positives['state'] = tkinter.NORMAL
@@ -186,7 +194,7 @@ class Window:
             self.__text_false_negative['state'] = tkinter.NORMAL
             self.__text_true_negative['state'] = tkinter.NORMAL
         else:
-            self.__text_theta['state'] = tkinter.DISABLED
+            self.__text_error['state'] = tkinter.DISABLED
             self.__text_epochs['state'] = tkinter.DISABLED
             self.__text_train['state'] = tkinter.DISABLED
             self.__text_true_positives['state'] = tkinter.DISABLED
@@ -197,7 +205,7 @@ class Window:
     # función que actualiza los entrys y los label
     def update_content_entrys_and_labels(self):
         # actualización de los entrys
-        self.__text_theta.delete("1.0", "end")
+        self.__text_error.delete("1.0", "end")
         self.__text_epochs.delete("1.0", "end")
         self.__text_train.delete("1.0", "end")
         self.__text_true_positives.delete("1.0", "end")
@@ -212,6 +220,10 @@ class Window:
         self.__lbl4["text"] = "0" 
         self.__lbl5["text"] = "0"
 
+    # función para mostrar mensajes enj pantalla
+    def __msg(self, text, title_t):
+         messagebox.showinfo(
+                message=text, title=title_t)
 
     # función que obtiene los valores (neuronas) para cada capa oculta
     def get_number_neurons_each_layer(self):
@@ -219,6 +231,7 @@ class Window:
         n_neurons_second_hidden_layer = int(self.__spinbox_hidden_2.get())
         self.__mlp.set_n_hidden_neurons_hidden_layers(n_neurons_first_hidden_layer, n_neurons_second_hidden_layer)
         self.__pointsBuilder.set_lines_graph(n_neurons_first_hidden_layer)
+        self.__is_selected_neurons = True
 
     # función que actualiza el estado de los botones relacionados a los inputs
     def update_buttons_entrys(self, state):
@@ -233,29 +246,16 @@ class Window:
 
 
    # función para mostrar la información por pantalla
-    def show_info(self):
-       self.update_text_boxes(True)
-       self.__text_theta.insert('1.0', str(self.__perceptron.get_theta()))
-       self.__text_epochs.insert('1.0', str(self.__perceptron.get_number_of_epochs()))
-       if self.__perceptron.get_status_perceptron():
-            self.__text_train.insert('1.0', "OK")
-       else:
-           self.__text_train.insert('1.0', "Error")
-
-       # obtención de los datos para la matriz de confusión
-       n_true_positive, n_false_positive, n_true_negative, n_false_negative = self.__perceptron.return_data_of_confuse_matrix()
-       self.__text_true_positives.insert('1.0', str(n_true_positive))
-       self.__text_false_positives.insert('1.0', str(n_false_positive))
-       self.__text_false_negative.insert('1.0', str(n_false_negative))
-       self.__text_true_negative.insert('1.0', str(n_true_negative))
-
-       # set de información a los labels de resultado
-       self.__lbl1["text"] = (str(n_true_positive + n_false_negative)) 
-       self.__lbl2["text"] = (str(n_true_negative + n_false_positive)) 
-       self.__lbl3["text"] = (str(n_true_positive + n_false_positive))
-       self.__lbl4["text"] = (str(n_true_negative + n_false_negative)) 
-       self.__lbl5["text"] = (str(self.__perceptron.return_n_samples()))
-       self.update_text_boxes(False)
+    def show_info(self, state):
+        self.update_text_boxes(True)
+        self.__text_error.insert('1.0', str(self.__mlp.return_error()))
+        self.__text_epochs.insert('1.0', str(self.__mlp.return_n_epochs()))
+        if state:
+            self.__text_train.insert('1.0', 'OK')
+        else:
+            self.__text_train.insert('1.0', 'ERROR')
+       
+        self.update_text_boxes(False)
 
     # función que nos valida si existe información previa para entrenar
     def __validate_data_to_train(self):
@@ -270,20 +270,26 @@ class Window:
 
     # metodo que comienza a entrenar con los datos actuales
     def train(self):
-        self.block_main_buttons(True)
-        self.__pointsBuilder.update_state_event(False)
-        self.update_buttons_entrys(True)
-        self.__mlp.set_data_for_train(self.__pointsBuilder.dataClass1, self.__pointsBuilder.dataClass2, 
-            self.__pointsBuilder.dataClass3)
+        if self.__validate_data_to_train():
+            if self.__is_selected_neurons and self.__is_initialize_weigths:
+                self.block_main_buttons(True)
+                self.__pointsBuilder.update_state_event(False)
+                self.update_buttons_entrys(True)
+                self.__mlp.set_data_for_train(self.__pointsBuilder.dataClass1, self.__pointsBuilder.dataClass2, 
+                    self.__pointsBuilder.dataClass3)
 
-        self.__mlp.train_net(self.__graph_error, self.__pointsBuilder)
-        # self.__mlp.train_net(self.__pointsBuilder)
+                status = self.__mlp.train_net(self.__graph_error)
+                self.show_info(status)
 
-        self.__pointsBuilder.change_class(-2)
-        self.__btn5['state'] = tkinter.NORMAL
-        self.__btn6['state'] = tkinter.NORMAL
-        self.__btn7['state'] = tkinter.NORMAL
-        self.__pointsBuilder.update_state_event(True)
+                self.__pointsBuilder.change_class(-2)
+                self.__btn5['state'] = tkinter.NORMAL
+                self.__btn6['state'] = tkinter.NORMAL
+                self.__btn7['state'] = tkinter.NORMAL
+                self.__pointsBuilder.update_state_event(True)
+            else:
+                self.__msg(text='Pesos no iniciados o neuronas no definidas', title_t='Error')
+        else:
+            self.__msg(text='No existen datos de entrenamiento', title_t='Error')
 
     # Cambio en el tipo de flor a mapear
     def class_flower_rose(self):
@@ -299,6 +305,7 @@ class Window:
     def inicialize_random(self):
         self.__mlp.set_random_weigths()
         self.__pointsBuilder.update_lines(self.__mlp.return_w1())
+        self.__is_initialize_weigths = True
         
 
     # evaluación de los puntos obtenidos posteriores al entrenamiento
@@ -342,6 +349,7 @@ class Window:
         else:
             n_epochs = int(n_epochs)
             self.__mlp.set_epochs(n_epochs)
+            self.__graph_error.set_number_of_epochs(n_epochs)
             messagebox.showinfo(
                 message="Número de epocas agregado correctamente", title="Éxito")
 
