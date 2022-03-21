@@ -14,7 +14,7 @@ class MultilayerPerceptron:
 		self.__us = 1.0 # umbral neurona de salida (equivalente a w0)
 		self.__uoc = None# umbrales de las capa oculta 1 (equivalentes a w0)
 		self.__uoc2 = None # numbrales en la segunda capa oculta (equivalentes a w0)
-		self.__precision = 0.00000001
+		self.__precision = 0.0000000001
 		self.__epocas = None
 		self.__fac_ap = 0.2
 		self.__n_inputs = 2
@@ -128,19 +128,19 @@ class MultilayerPerceptron:
 				self.__forward()
 				self.__backPropagation()
 				self.__forward()# detección del nuevo error actual
-				self.__Error_actual[index] = (0.5) * ((self.__di - self.__a3)**2)# error actual
-				print(f'Deseada: {self.__di},   obtenida: {self.__a3}')
+				self.__Error_actual[index] = ((self.__di - self.__a3)**2)# error actual
 
 				# actualización de los pesos grafica
 			self.__error_mlp()# calculo del error de la red
-			print("")
 			n_epochs += 1
 			graph_error.add_data(np.asscalar(np.abs(self.__net_error)))
-			graph_error.update_graph(n_epochs)
+			if n_epochs % 200 == 0:
+				graph_error.update_graph(n_epochs)
 			if n_epochs > self.__epochs:
 				done = False
 				break
 		self.__n_epochs_train = n_epochs
+		graph_error.update_graph(n_epochs)
 		return done
 
 
@@ -148,9 +148,9 @@ class MultilayerPerceptron:
 	def __set_values_for_n3_a3(self):
 		match self.__n_layers:
 			case 1:
-				self.__n3 = (np.dot(self.__w3,self.__a1) + self.__us) # n3
+				self.__n3 = (np.dot(self.__w3,self.__a1) + (self.__us)) # n3
 			case 2:
-				self.__n3 = (np.dot(self.__w3,self.__a2) + self.__us) # n3
+				self.__n3 = (np.dot(self.__w3,self.__a2) + (self.__us)) # n3
 
 		self.__a3 = self.__tanh(self.__n3)
 
@@ -158,7 +158,7 @@ class MultilayerPerceptron:
 	def __forward(self):
 		# obtención de las nets de la primera capa oculta
 		for i in range(self.__n_hidden1):
-			self.__n1[i,:] = np.dot(self.__w1[i,:], self.__Inputs) + self.__uoc[i,:]
+			self.__n1[i,:] = np.dot(self.__w1[i,:], self.__Inputs) + (self.__uoc[i,:])
 
 		# Calcular la activacion de la neuronas en la capa oculta
 		for o in range(self.__n_hidden1):
@@ -167,10 +167,10 @@ class MultilayerPerceptron:
         # Operaciones en la segunda capa
 		for a in range(self.__n_hidden2):
         	# equivalente a n1
-			self.__n2[a,:] = np.dot(self.__w2[a,:], self.__a1) + self.__uoc2[a,:]
+			self.__n2[a,:] = np.dot(self.__w2[a,:], self.__a1) + (self.__uoc2[a,:])
 
 		for o in range(self.__n_hidden2):
-			self.__a2[o,:] = self.__tanh(self.__n2[o,:])
+			self.__a2[o,:] = self.__sigmode(self.__n2[o,:])
 
 
         # calculo de la net para la capa de salida y su salida
@@ -219,7 +219,7 @@ class MultilayerPerceptron:
     	# calculo de la sensibilidad de la capa de salida
 		self.__s3 = (self.__dtanh(self.__n3) * self.__real_error)
     	# Ajustar umbral us (w0)
-		self.__us = self.__us + (self.__fac_ap * self.__s3)
+		self.__us = (self.__us ) + (self.__fac_ap * self.__s3)
 		self.__update_weigths()
         # Ajustar los pesos w1
 		for j in range(self.__n_hidden1):

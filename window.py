@@ -20,7 +20,7 @@ class Window:
         fig.set_size_inches(12.5, 4.6)
         ax.set_xlim([-1, 1])
         ax.set_ylim([-1, 1])
-        ax1.set_xlim([0, 8000])
+        ax1.set_xlim([0, 500])
         ax1.set_ylim([-0.2, 1])
         ax.set_title('Perceptron Multicapa')
         ax1.set_title('Error cuadrático')
